@@ -1,0 +1,23 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.button {
+  width: max-content;
+  padding: 10px 20px;
+  border: none;
+  background-color: rgb(130, 133, 133);
+  &:hover {
+    background-color: rgb(82, 190, 190);
+  }
+}
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: max-content;
+}
+.input {
+  padding: 10px;
+}

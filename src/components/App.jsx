@@ -14,6 +14,7 @@ export const App = () => {
     if (contactsList) {
       setContacts([...contacts, ...contactsList]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

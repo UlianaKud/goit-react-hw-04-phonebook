@@ -1,52 +1,35 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import Form from './Form/Form.jsx';
 import Contact from './Contacts/contact.jsx';
 import Filter from './Filter/filter.jsx';
 import { nanoid } from 'nanoid';
 import Notiflix from 'notiflix';
 
-export class App extends Component {
-  state = {
-    contacts: [
-      // { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-      // { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-      // { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-      // { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    ],
-    filter: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState([]);
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const { contacts } = this.state;
+  useEffect(() => {
     const contactsList = JSON.parse(localStorage.getItem('contacts-list'));
     if (contactsList) {
-      this.setState({ contacts: [...contacts, ...contactsList] });
+      setContacts([...contacts, ...contactsList]);
     }
-  }
+  }, []);
 
-  deleteContact = idContact => {
-    const { contacts } = this.state;
-    console.log(idContact, contacts);
-    console.log(contacts.filter(contact => contact.id !== idContact));
+  useEffect(() => {
+    localStorage.setItem('contacts-list', JSON.stringify(contacts));
+  }, [contacts]);
 
-    this.setState(
-      {
-        contacts: contacts.filter(contact => contact.id !== idContact),
-      },
-      () =>
-        localStorage.setItem(
-          'contacts-list',
-          JSON.stringify(this.state.contacts)
-        )
-    );
+  const deleteContact = idContact => {
+    setContacts(contacts.filter(contact => contact.id !== idContact));
   };
-  handleChangeFilter = evt => {
+  const handleChangeFilter = evt => {
     const { value } = evt.target;
-    this.setState({ filter: value });
+    setFilter(value);
   };
-  addContact = data => {
+
+  const addContact = data => {
     const { name, number } = data;
-    const { contacts } = this.state;
     const normalizedname = name.toLocaleLowerCase();
 
     if (
@@ -61,54 +44,37 @@ export class App extends Component {
       name,
       number,
     };
-    this.setState({ contacts: [...contacts, contactsValue] }, () => {
-      localStorage.setItem(
-        'contacts-list',
-        JSON.stringify(this.state.contacts)
-      );
-    });
+    setContacts([...contacts, contactsValue]);
   };
 
-  getVisibleContacts = () => {
-    const { filter, contacts } = this.state;
+  const getVisibleContacts = () => {
     const normalizedFilter = filter.toLocaleLowerCase();
     return contacts.filter(contact =>
       contact.name.toLocaleLowerCase().includes(normalizedFilter)
     );
   };
-
-  render() {
-    const visibleContacts = this.getVisibleContacts();
-
-    return (
-      <div
-        style={{
-          height: '100vh',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-          padding: '30px',
-        }}
-      >
-        <div>
-          <h1>Phonebook</h1>
-          <Form
-            handleChange={this.handleChange}
-            addContacts={this.addContact}
-          />
-          <h2>Contacts</h2>
-          <Filter
-            handleChangeFilter={this.handleChangeFilter}
-            value={this.state.filter}
-          />
-          <Contact
-            contacts={visibleContacts}
-            onDeleteContact={this.deleteContact}
-          />
-        </div>
+  return (
+    <div
+      style={{
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: 40,
+        color: '#010101',
+        padding: '30px',
+      }}
+    >
+      <div>
+        <h1>Phonebook</h1>
+        <Form addContacts={addContact} />
+        <h2>Contacts</h2>
+        <Filter handleChangeFilter={handleChangeFilter} value={filter} />
+        <Contact
+          contacts={getVisibleContacts()}
+          onDeleteContact={deleteContact}
+        />
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
